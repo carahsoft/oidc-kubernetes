@@ -8,14 +8,13 @@ metadata:
     ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:
-    - secretName: kuberos-tls-secret
+    - secretName: {{ .tlsSecret }}
       hosts:
-        - "kuberos.{{ .domain }}"
+        - {{ .hostname }}.{{ .domain }}
   rules:
-    - host: "kuberos.{{ .domain }}"
+    - host: {{ .hostname }}.{{ .domain }}
       http:
         paths:
-          - path: /
-            backend:
-              serviceName: kuberos
-              servicePort: 80
+        -  backend:
+             serviceName: kuberos
+             servicePort: 80

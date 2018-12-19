@@ -1,20 +1,38 @@
 ---
-context: cluster.example.org
+context: kubernetes
 global:
-  context: cluster.example.org
-  domain: example.org
-  oidcClientURL: https://accounts.google.com
-  oidcClientID: REDACTED.apps.googleusercontent.com
-  oidcClientSecret:
-  tlsKey:
-  tlsCert:
+  context: kubernetes
+  domain: yourdomain.com
+  # URL for OpenID Connect without /.well-known/openid-configuration
+  oidcClientURL: 
+  oidcClientID: 
+  oidcClientSecret: 
 include:
+  - name: rbac
+    values:
+      # All users will be created their own namespace with full access
+      # and granted full access to shared namespaces
+      sharedNamespaces:
+        - production
+      # String suffix to remove from usernames when creating namesapces
+      namespaceSuffixTrim: "@yourdomain.com"
+      developers:
+        - dev@yourdomain.com
+      # Admins will have cluster-admin privileges
+      admins:
+        - admin@yourdomain.com
   - name: oidc-proxy-dashboard
     values:
-      developers:
-        - bill@example.org
-      admins:
-        - 500IQDevOpsGenius@example.org
-
+      hostname: kube-dashboard
+      tlsSecret: kubernetes-dashboard-ingress-certs
+      backendServerURL: https://kubernetes-dashboard.kube-system.svc.cluster.local:443
   - name: kuberos
-
+    values:
+      hostname: kube-ctl
+      tlsSecret: kubernetes-ctl-ingress-certs
+      # Kubernetes API Server URL
+      # Obtain from /etc/kubernetes/admin.conf cluster.cluster.server
+      apiServer: 
+      # Kubernetes API Certificate Authority
+      # Obtain from /etc/kubernetes/admin.conf cluster.cluster.certificate-authority-data
+      certificateAuthority:

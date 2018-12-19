@@ -12,5 +12,5 @@ data:
     clusters:
     - name: {{ .context }}
       cluster:
-        certificate-authority-data: REDACTED
-        server: https://api.{{ .context }}
+        certificate-authority-data: {{ .certificateAuthority }}
+        server: {{ .apiServer }}

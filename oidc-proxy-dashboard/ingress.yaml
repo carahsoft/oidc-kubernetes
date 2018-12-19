@@ -7,14 +7,13 @@ metadata:
   namespace: kube-system
 spec:
   tls:
-    - secretName: kuber-tls-secret
+    - secretName: {{ .tlsSecret }}
       hosts:
-        - kuber.{{ .domain }}
+        - {{ .hostname }}.{{ .domain }}
   rules:
-  - host: kuber.{{ .domain }}
+  - host: {{ .hostname }}.{{ .domain }}
     http:
       paths:
       - backend:
           serviceName: kubernetes-dashboard-oidc
           servicePort: 80
-        path: /

@@ -1,0 +1,119 @@
+{{ $namespaceSuffixTrim := .namespaceSuffixTrim }}
+# Grant all full access to shared namespaces
+{{ $developers := .developers }}
+{{ range $namespace := .sharedNamespaces }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $namespace }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ $namespace }}
+  name: developers
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: {{ $namespace }}
+  name: developers-binding
+subjects:
+{{ range $developer := $developers }}
+- kind: User
+  name: {{ $developer }}
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
+roleRef:
+  kind: Role
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
+# Create namespace per developer and grant full access
+{{ range .developers }}
+{{ $namespace := trimSuffix $namespaceSuffixTrim . }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $namespace }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ $namespace }}
+  name: developers
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: {{ $namespace }}
+  name: developers-binding
+subjects:
+- kind: User
+  name: {{ . }}
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
+# Create namespace per admin
+{{ range .admins }}
+{{ $namespace := trimSuffix $namespaceSuffixTrim . }}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $namespace }}
+{{ end }}
+# Grant developers view access to cluster
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: developers
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: developers-binding
+subjects:
+{{ range .developers }}
+- kind: User
+  name: {{ . }}
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
+roleRef:
+  kind: ClusterRole
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+# Grant admins full access to cluster
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: admins-binding
+subjects:
+{{ range .admins }}
+- kind: User
+  name: {{ . }}
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
