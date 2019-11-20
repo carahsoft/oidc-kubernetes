@@ -25,7 +25,7 @@ include:
     values:
       hostname: kube-dashboard
       tlsSecret: kubernetes-dashboard-ingress-certs
-      backendServerURL: https://kubernetes-dashboard.kube-system.svc.cluster.local:443
+      backendServerURL: https://kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local:443
   - name: kuberos
     values:
       hostname: kube-ctl

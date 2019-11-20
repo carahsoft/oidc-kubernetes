@@ -3,6 +3,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
   name: kubernetes-dashboard-oidc
   namespace: kube-system
 spec:

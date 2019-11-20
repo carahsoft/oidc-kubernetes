@@ -1,13 +1,13 @@
 ---
 kind: Deployment
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 metadata:
   labels:
     app: kubernetes-dashboard-oidc
   name: kubernetes-dashboard-oidc
   namespace: kube-system
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 2
   selector:
     matchLabels:
@@ -34,11 +34,6 @@ spec:
               secretKeyRef:
                 name: kubernetes-dashboard-oidc
                 key: client_secret
-          - name: SESSION_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: kubernetes-dashboard-oidc
-                key: session
         volumeMounts:
           - name: openresty-conf
             mountPath: /conf

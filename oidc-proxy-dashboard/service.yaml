@@ -12,3 +12,4 @@ spec:
     targetPort: 9000
   selector:
     app: kubernetes-dashboard-oidc
+  sessionAffinity: ClientIP
